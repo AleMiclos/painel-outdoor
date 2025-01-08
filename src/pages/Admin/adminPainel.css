@@ -1,0 +1,96 @@
+.admin-dashboard {
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.status-message {
+  margin-bottom: 20px;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.status-message.success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 50px;
+}
+
+.no-totems-message {
+  text-align: center;
+  font-size: 18px;
+  color: #555;
+}
+
+.totems-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.totem-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.totem-card h2 {
+  margin: 10px 0;
+  font-size: 22px;
+}
+
+.totem-card p {
+  margin: 5px 0;
+  font-size: 16px;
+}
+
+.card-actions {
+  margin-top: 15px;
+}
+
+.card-actions button,
+.card-actions a {
+  margin: 5px;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.card-actions button {
+  background-color: #e74c3c;
+  color: #fff;
+}
+
+.card-actions button:hover {
+  background-color: #c0392b;
+}
+
+.card-actions a {
+  background-color: #3498db;
+  color: #fff;
+}
+
+.card-actions a:hover {
+  background-color: #2980b9;
+}
