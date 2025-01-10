@@ -53,3 +53,12 @@ a {
     width: 100%;
 
 }
+
+.user-info {
+    position:relative;
+    font-size: 18px;
+    color: #fff;
+    font-weight: 500;
+    margin-left: 40px;
+  }
+  

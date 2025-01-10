@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from '../../services/axios';
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
 import './login.css';
 
@@ -19,13 +19,12 @@ function LoginPage() {
       const response = await axios.post('/auth/login', { email, password });
       const tokenFromApi = response.data.token;
 
+      localStorage.setItem('userName', email);
       localStorage.setItem('userToken', tokenFromApi);
       setToken(tokenFromApi);
 
       const decoded = jwtDecode(tokenFromApi);
       const { role, totemId } = decoded;
-
-      localStorage.setItem('totemId', totemId);
 
       if (role === 'admin') {
         navigate('/admin-dashboard');
@@ -33,7 +32,7 @@ function LoginPage() {
         navigate(`/cliente-dashboard?totemId=${totemId}`);
       }
     } catch (err) {
-      setError(err.response?.data?.error || 'Erro ao fazer login.');
+      setError(err.response?.data?.error || 'Erro ao fazer login. Verifique suas credenciais.');
     }
   };
 
@@ -44,15 +43,17 @@ function LoginPage() {
       alert('Usuário registrado com sucesso!');
       setIsRegistering(false);
     } catch (err) {
-      setError(err.response?.data?.error || 'Erro ao registrar usuário.');
+      setError(err.response?.data?.error || 'Erro ao registrar usuário. Tente novamente.');
     }
   };
 
   return (
     <div className="container">
+      <form className="loginForm" onSubmit={(e) => e.preventDefault()}>
+        <h2 className="logint">{isRegistering ? 'Registrar' : 'Login'}</h2>
 
-      <form className='loginForm' onSubmit={(e) => e.preventDefault()}>
-        <h2 className='logint'>{isRegistering ? 'Registrar' : 'Login'}</h2>
+        {error && <p className="error-message">{error}</p>}
+
         <div className="form-group">
           <label htmlFor="email">Email</label>
           <input
@@ -99,10 +100,10 @@ function LoginPage() {
         </div>
 
         <div className="switch-auth">
-        <button onClick={() => setIsRegistering(!isRegistering)}>
-          {isRegistering ? 'Já tem conta? Faça login' : 'Ainda não tem conta? Registre-se'}
-        </button>
-      </div>
+          <button onClick={() => setIsRegistering(!isRegistering)}>
+            {isRegistering ? 'Já tem conta? Faça login' : 'Ainda não tem conta? Registre-se'}
+          </button>
+        </div>
       </form>
     </div>
   );

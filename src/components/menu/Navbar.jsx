@@ -1,27 +1,34 @@
-import React from "react";
-import { useNavigate } from "react-router-dom"; // Para redirecionamento
-import './NavBar.css';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; 
+import "./NavBar.css";
 
 const Navbar = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+  const [userName, setUserName] = useState("");
 
-    const handleLogout = (e) => {
-        e.preventDefault(); // Impede o comportamento padrão do link
-        localStorage.clear(); // Limpa tudo
-        navigate("/login");
-    };
+  useEffect(() => {
+    const storedUserName = localStorage.getItem("userName") || "Usuário";
+    setUserName(storedUserName);
+  }, []);
 
-    return (
-        <header className="header">
-            <a href="/" className="logo">Logo</a>
+  const handleLogout = (e) => {
+    e.preventDefault(); 
+    localStorage.clear(); 
+    navigate("/login");
+  };
 
-            <nav className="navbar">
-                <a href="/" onClick={() => navigate("/")}>Home</a>
-                <a href="/" onClick={() => navigate("/about")}>About</a>
-                <a href="/" onClick={handleLogout}>Logout</a>
-            </nav>
-        </header>
-    );
-}
+  return (
+    <header className="header">
+      <a href="/" className="logo">Logo</a>
+
+      <nav className="navbar">
+        <a href="/" onClick={() => navigate("/")}>Home</a>
+        <a href="/" onClick={() => navigate("/about")}>About</a>
+        <span className="user-info">Bem-vindo, {userName}</span>
+        <a href="/" onClick={handleLogout}>Logout</a>
+      </nav>
+    </header>
+  );
+};
 
 export default Navbar;

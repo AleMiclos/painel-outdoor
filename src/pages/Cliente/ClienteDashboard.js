@@ -2,221 +2,187 @@ import React, { useState, useEffect } from "react";
 import axios from "../../services/axios";
 import { Oval } from "react-loader-spinner";
 import "./painel.css";
-import Navbar from '../../components/menu/Navbar';
-
-
+import Navbar from "../../components/menu/Navbar";
 
 function ClienteDashboard() {
-  const [statusMessage, setStatusMessage] = useState("");
+  const [totems, setTotems] = useState([]);
+  const [editingTotem, setEditingTotem] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    videoUrl: "",
-    isActive: true,
-  });
+  const [statusMessage, setStatusMessage] = useState("");
 
-  const fetchTotemData = async () => {
+  const fetchTotems = async () => {
     try {
-      const totemId = localStorage.getItem("totemId") || new URLSearchParams(window.location.search).get("totemId");
-
-      if (!totemId || totemId === "undefined") {
-        setStatusMessage("Totem não encontrado.");
-        setLoading(false);
-        return;
-      }
-
       const token = localStorage.getItem("userToken");
+      if (!token) throw new Error("Token não encontrado.");
 
-      if (!token) {
-        setStatusMessage("Token não encontrado.");
-        setLoading(false);
-        return;
-      }
-
-      const response = await axios.get(`/totems/${totemId}`, {
+      const response = await axios.get("/totems", {
         headers: { Authorization: `Bearer ${token}` },
       });
-
-      const { title, description, videoUrl, isActive } = response.data;
-
-      setFormData({
-        title: title || "",
-        description: description || "",
-        videoUrl: videoUrl || "",
-        isActive: isActive !== undefined ? isActive : false,
-      });
-
-      setStatusMessage("Informações carregadas com sucesso!");
+      setTotems(response.data);
     } catch (error) {
-      handleError(error, "Erro ao carregar informações.");
+      setStatusMessage("Erro ao carregar os totens.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleAddTotem = async () => {
     try {
-      const totemId = localStorage.getItem("totemId") || new URLSearchParams(window.location.search).get("totemId");
       const token = localStorage.getItem("userToken");
+      if (!token) throw new Error("Token não encontrado.");
 
-      if (!totemId || totemId === "undefined") {
-        throw new Error("Totem não identificado.");
-      }
+      const newTotem = {
+        title: "Novo Totem",
+        description: "Descrição do totem",
+        videoUrl: "https://example.com/video.mp4", // URL exemplo
+        isActive: true,
+      };
 
-      if (!token) {
-        throw new Error("Token de autenticação ausente.");
-      }
-
-      await axios.post(`/totems/${totemId}`, formData, {
+      const response = await axios.post("/totems", newTotem, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      setStatusMessage("Informações atualizadas com sucesso!");
-      fetchTotemData();
+      setTotems((prev) => [...prev, response.data.totem]);
+      setStatusMessage("Totem adicionado com sucesso!");
     } catch (error) {
-      handleError(error, "Erro ao atualizar informações do totem.");
+      const errorMessage = error.response?.data?.error || "Erro ao adicionar o totem.";
+      setStatusMessage(errorMessage);
     }
   };
 
-  const handleError = (error, defaultMessage) => {
-    const message = error.response?.data?.error || defaultMessage;
-    if (error.response?.status === 401) {
-      setStatusMessage("Token inválido. Redirecionando para login...");
-      setTimeout(() => {
-        window.location.href = "/login";  // ou use react-router
-      }, 2000);
-    } else {
-      setStatusMessage(message);
+  const handleRemoveTotem = async (totemId) => {
+    try {
+      const token = localStorage.getItem("userToken");
+      if (!token) throw new Error("Token não encontrado.");
+
+      await axios.delete(`/totems/${totemId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setTotems((prev) => prev.filter((totem) => totem._id !== totemId));
+      setStatusMessage("Totem removido com sucesso!");
+    } catch (error) {
+      setStatusMessage("Erro ao remover o totem.");
     }
   };
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+  const handleStartEditing = (totem) => {
+    setEditingTotem({ ...totem }); // Copia o totem para edição
   };
 
-  const extractVimeoVideoId = (url) => {
-    const match = url.match(/(?:vimeo\.com\/)(\d+)/);
-    if (match) {
-      console.log("Vimeo Video ID:", match[1]);
-      return match[1];
-    } else {
-      console.error("Failed to extract Vimeo video ID from URL:", url);
-      return null;
+  const handleUpdateField = (field, value) => {
+    setEditingTotem((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSaveChanges = async () => {
+    if (!editingTotem) return;
+
+    try {
+      const token = localStorage.getItem("userToken");
+      if (!token) throw new Error("Token não encontrado.");
+
+      const response = await axios.put(`/totems/${editingTotem._id}`, editingTotem, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setTotems((prev) =>
+        prev.map((totem) =>
+          totem._id === editingTotem._id ? response.data : totem
+        )
+      );
+      setStatusMessage("Totem atualizado com sucesso!");
+      setEditingTotem(null); // Sai do modo de edição
+    } catch (error) {
+      const errorMessage = error.response?.data?.error || "Erro ao atualizar o totem.";
+      setStatusMessage(errorMessage);
     }
   };
 
   useEffect(() => {
-    const totemId = localStorage.getItem("totemId") || new URLSearchParams(window.location.search).get("totemId");
-    if (totemId && totemId !== "undefined") {
-      fetchTotemData();
-    } else {
-      setStatusMessage("Totem não encontrado.");
-      setLoading(false);
-    }
+    fetchTotems();
   }, []);
-
-  
-
 
   if (loading) {
     return (
       <div className="loading-container">
         <Oval color="#00BFFF" height={80} width={80} />
-        <p>Carregando dados do totem...</p>
+        <p>Carregando dados dos totens...</p>
       </div>
     );
   }
 
   return (
-    <><div className="dashboard-container">
-      <div>
+    <div className="dashboard-container">
       <Navbar />
+      <h1 className="dashboard-title">Painel de Totens</h1>
+      <button className="btn primary" onClick={handleAddTotem}>
+        Adicionar Totem
+      </button>
+
+      {statusMessage && (
+        <div
+          className={`status-message ${statusMessage.includes("Erro") ? "error" : "success"}`}
+          aria-live="polite"
+        >
+          {statusMessage}
+        </div>
+      )}
+
+      <div className="totens-list">
+        {totems.map((totem) => (
+          <div key={totem._id} className="totem-card">
+            {editingTotem && editingTotem._id === totem._id ? (
+              <>
+                <input
+                  type="text"
+                  value={editingTotem.title}
+                  onChange={(e) => handleUpdateField("title", e.target.value)}
+                  placeholder="Título do Totem"
+                />
+                <textarea
+                  value={editingTotem.description}
+                  onChange={(e) => handleUpdateField("description", e.target.value)}
+                  placeholder="Descrição do Totem"
+                />
+                <input
+                  type="text"
+                  value={editingTotem.videoUrl}
+                  onChange={(e) => handleUpdateField("videoUrl", e.target.value)}
+                  placeholder="URL do Vídeo"
+                />
+                <button className="btn success" onClick={handleSaveChanges}>
+                  Atualizar
+                </button>
+                <button
+                  className="btn secondary"
+                  onClick={() => setEditingTotem(null)}
+                >
+                  Cancelar
+                </button>
+              </>
+            ) : (
+              <>
+                <h3>{totem.title}</h3>
+                <p>{totem.description}</p>
+                <p>{totem.videoUrl}</p>
+                <button
+                  className="btn primary"
+                  onClick={() => handleStartEditing(totem)}
+                >
+                  Editar
+                </button>
+                <button
+                  className="btn secondary"
+                  onClick={() => handleRemoveTotem(totem._id)}
+                >
+                  Remover
+                </button>
+              </>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
-        <h1 className="dashboard-title">Painel do Totem</h1>
-        <p className="dashboard-subtitle">Atualize as informações exibidas no totem digital.</p>
-        <p className="dashboard-subtitle">
-          {formData && (
-            <a
-              href={`http://localhost:3000/totem/${localStorage.getItem("totemId") || new URLSearchParams(window.location.search).get("totemId")}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Seu totem: {localStorage.getItem("totemId") || new URLSearchParams(window.location.search).get("totemId")}
-            </a>
-          )}
-        </p>
-
-        {statusMessage && (
-          <div className={`status-message ${statusMessage.includes("Erro") ? "error" : "success"}`} aria-live="polite">
-            {statusMessage}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="dashboard-form">
-          <div className="form-group">
-            <label htmlFor="title">Título</label>
-            <input
-              type="text"
-              id="title"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              placeholder="Digite o título"
-              required />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="description">Descrição</label>
-            <textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              placeholder="Digite a descrição"
-              required />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="videoUrl">URL do Vídeo (Vimeo)</label>
-            <input
-              type="url"
-              id="videoUrl"
-              name="videoUrl"
-              value={formData.videoUrl}
-              onChange={handleChange}
-              placeholder="Cole a URL do vídeo do Vimeo"
-              required />
-          </div>
-
-
-
-          <div className="form-actions">
-            <button type="submit" className="btn primary">Atualizar</button>
-            <button type="button" className="btn secondary" onClick={fetchTotemData}>Recarregar</button>
-          </div>
-        </form>
-
-        {formData.videoUrl && (
-          <div className="video-preview">
-            <h2>Pré-visualização do Vídeo</h2>
-            <iframe
-              src={`https://player.vimeo.com/video/${extractVimeoVideoId(formData.videoUrl)}`}
-              width="640"
-              height="360"
-              frameBorder="0"
-              allow="autoplay; fullscreen; picture-in-picture"
-              allowFullScreen
-              title="Vídeo do Totem"
-            ></iframe>
-          </div>
-        )}
-      </div></>
   );
 }
 
