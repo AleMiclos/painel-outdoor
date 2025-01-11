@@ -3,6 +3,8 @@ import axios from "../../services/axios";
 import { Oval } from "react-loader-spinner";
 import "./adminPainel.css";
 import Navbar from "../../components/menu/Navbar.jsx";
+import { Link } from "react-router-dom";
+
 
 const StatusMessage = ({ message }) => {
   if (!message) return null;
@@ -26,23 +28,28 @@ const TotemCard = ({
   onUpdateField,
   onSaveChanges,
 }) => {
+  // Verifica se o `totem` está disponível antes de renderizar
+  if (!totem) {
+    return <p>Totem não encontrado ou inválido.</p>;
+  }
+
   if (isEditing) {
     return (
       <div className="totem-card">
         <input
           type="text"
-          value={totem.title}
+          value={totem.title || ""}
           onChange={(e) => onUpdateField("title", e.target.value)}
           placeholder="Título do Totem"
         />
         <textarea
-          value={totem.description}
+          value={totem.description || ""}
           onChange={(e) => onUpdateField("description", e.target.value)}
           placeholder="Descrição do Totem"
         />
         <input
           type="text"
-          value={totem.videoUrl}
+          value={totem.videoUrl || ""}
           onChange={(e) => onUpdateField("videoUrl", e.target.value)}
           placeholder="URL do Vídeo"
         />
@@ -61,13 +68,7 @@ const TotemCard = ({
       <h2>{totem.title}</h2>
       <p>{totem.description}</p>
       <p>
-        <a
-          href={totem.videoUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Link para o Totem
-        </a>
+        <a href={`/totem/${totem._id}`}>Acessar Totem</a>
       </p>
       <div className="card-actions">
         <button className="edit-button" onClick={() => onEdit(totem)}>
@@ -80,6 +81,7 @@ const TotemCard = ({
     </div>
   );
 };
+
 
 function AdminDashboard() {
   const [totems, setTotems] = useState([]);

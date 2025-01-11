@@ -4,7 +4,7 @@ import { Oval } from "react-loader-spinner";
 import "./painel.css";
 import Navbar from "../../components/menu/Navbar";
 
-function ClienteDashboard() {
+function TotemsDashboard() {
   const [totems, setTotems] = useState([]);
   const [editingTotem, setEditingTotem] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -30,18 +30,19 @@ function ClienteDashboard() {
     try {
       const token = localStorage.getItem("userToken");
       if (!token) throw new Error("Token não encontrado.");
-
+  
       const newTotem = {
-        title: "Novo Totem",
-        description: "Descrição do totem",
-        videoUrl: "https://example.com/video.mp4", // URL exemplo
+        title: "Título padrão", 
+        description: "Descrição padrão",
+        videoUrl: "http://example.com/video.mp4",
         isActive: true,
       };
-
-      const response = await axios.post("/totems", newTotem, {
-        headers: { Authorization: `Bearer ${token}` },
+  
+      const response = await axios.post("/totems/totems", newTotem, {
+        baseURL: "https://outdoor-backend.onrender.com", // Base URL do backend
+        headers: { Authorization: `Bearer ${token}` }, // Token do usuário autenticado
       });
-
+  
       setTotems((prev) => [...prev, response.data.totem]);
       setStatusMessage("Totem adicionado com sucesso!");
     } catch (error) {
@@ -49,6 +50,8 @@ function ClienteDashboard() {
       setStatusMessage(errorMessage);
     }
   };
+  
+  
 
   const handleRemoveTotem = async (totemId) => {
     try {
@@ -186,4 +189,4 @@ function ClienteDashboard() {
   );
 }
 
-export default ClienteDashboard;
+export default TotemsDashboard;

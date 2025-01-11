@@ -1,8 +1,12 @@
 import axios from 'axios';
 
-const api = axios.create({
-  baseURL: 'https://outdoor-backend.onrender.com/', // Atualize com sua URL de backend
-});
+ const api = axios.create({
+   baseURL: 'https://outdoor-backend.onrender.com/', // Atualize com sua URL de backend
+ });
+
+// const api = axios.create({
+  // baseURL: 'http://localhost:5000/', // Atualize com sua URL de backend
+// });
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('userToken');
