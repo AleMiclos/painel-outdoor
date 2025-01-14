@@ -1,5 +1,38 @@
 .admin-dashboard {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.layout-container {
+  display: flex;
+  flex: 1;
+}
+
+.lateral-menu {
+  width: 300px;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
   padding: 20px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+}
+
+.main-content {
+  flex: 1;
+  margin-left: 300px; /* Espaço reservado para o menu lateral */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.no-user-selected {
+  font-size: 1.2em;
 }
 
 h1 {
@@ -93,4 +126,22 @@ h1 {
 
 .card-actions a:hover {
   background-color: #2980b9;
+}
+
+.user-group {
+  margin-bottom: 40px; /* Espaço entre grupos */
+}
+
+.user-group h2 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 20px; /* Espaço abaixo do título */
+  text-align: left;
+}
+
+/* Estilo dos Cards */
+.totens-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 cards por linha */
+  gap: 20px; /* Espaçamento entre cards */
 }

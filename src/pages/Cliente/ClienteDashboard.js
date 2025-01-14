@@ -15,10 +15,11 @@ function TotemsDashboard() {
       const token = localStorage.getItem("userToken");
       if (!token) throw new Error("Token não encontrado.");
 
+      // Chamar API para buscar totens do usuário logado
       const response = await axios.get("/totems", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setTotems(response.data);
+      setTotems(response.data); // Assumindo que a API retorna apenas os totens do usuário logado
     } catch (error) {
       setStatusMessage("Erro ao carregar os totens.");
     } finally {
@@ -26,51 +27,8 @@ function TotemsDashboard() {
     }
   };
 
-  const handleAddTotem = async () => {
-    try {
-      const token = localStorage.getItem("userToken");
-      if (!token) throw new Error("Token não encontrado.");
-  
-      const newTotem = {
-        title: "Título padrão", 
-        description: "Descrição padrão",
-        videoUrl: "http://example.com/video.mp4",
-        isActive: true,
-      };
-  
-      const response = await axios.post("/totems/totems", newTotem, {
-        baseURL: "https://outdoor-backend.onrender.com", // Base URL do backend
-        headers: { Authorization: `Bearer ${token}` }, // Token do usuário autenticado
-      });
-  
-      setTotems((prev) => [...prev, response.data.totem]);
-      setStatusMessage("Totem adicionado com sucesso!");
-    } catch (error) {
-      const errorMessage = error.response?.data?.error || "Erro ao adicionar o totem.";
-      setStatusMessage(errorMessage);
-    }
-  };
-  
-  
-
-  const handleRemoveTotem = async (totemId) => {
-    try {
-      const token = localStorage.getItem("userToken");
-      if (!token) throw new Error("Token não encontrado.");
-
-      await axios.delete(`/totems/${totemId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      setTotems((prev) => prev.filter((totem) => totem._id !== totemId));
-      setStatusMessage("Totem removido com sucesso!");
-    } catch (error) {
-      setStatusMessage("Erro ao remover o totem.");
-    }
-  };
-
   const handleStartEditing = (totem) => {
-    setEditingTotem({ ...totem }); // Copia o totem para edição
+    setEditingTotem({ ...totem });
   };
 
   const handleUpdateField = (field, value) => {
@@ -94,7 +52,7 @@ function TotemsDashboard() {
         )
       );
       setStatusMessage("Totem atualizado com sucesso!");
-      setEditingTotem(null); // Sai do modo de edição
+      setEditingTotem(null);
     } catch (error) {
       const errorMessage = error.response?.data?.error || "Erro ao atualizar o totem.";
       setStatusMessage(errorMessage);
@@ -115,77 +73,76 @@ function TotemsDashboard() {
   }
 
   return (
-    <div className="dashboard-container">
+    <>
       <Navbar />
-      <h1 className="dashboard-title">Painel de Totens</h1>
-      <button className="btn primary" onClick={handleAddTotem}>
-        Adicionar Totem
-      </button>
+      <div className="dashboard-container">
+        <h1 className="dashboard-title">Meus Totens</h1>
 
-      {statusMessage && (
-        <div
-          className={`status-message ${statusMessage.includes("Erro") ? "error" : "success"}`}
-          aria-live="polite"
-        >
-          {statusMessage}
-        </div>
-      )}
-
-      <div className="totens-list">
-        {totems.map((totem) => (
-          <div key={totem._id} className="totem-card">
-            {editingTotem && editingTotem._id === totem._id ? (
-              <>
-                <input
-                  type="text"
-                  value={editingTotem.title}
-                  onChange={(e) => handleUpdateField("title", e.target.value)}
-                  placeholder="Título do Totem"
-                />
-                <textarea
-                  value={editingTotem.description}
-                  onChange={(e) => handleUpdateField("description", e.target.value)}
-                  placeholder="Descrição do Totem"
-                />
-                <input
-                  type="text"
-                  value={editingTotem.videoUrl}
-                  onChange={(e) => handleUpdateField("videoUrl", e.target.value)}
-                  placeholder="URL do Vídeo"
-                />
-                <button className="btn success" onClick={handleSaveChanges}>
-                  Atualizar
-                </button>
-                <button
-                  className="btn secondary"
-                  onClick={() => setEditingTotem(null)}
-                >
-                  Cancelar
-                </button>
-              </>
-            ) : (
-              <>
-                <h3>{totem.title}</h3>
-                <p>{totem.description}</p>
-                <p>{totem.videoUrl}</p>
-                <button
-                  className="btn primary"
-                  onClick={() => handleStartEditing(totem)}
-                >
-                  Editar
-                </button>
-                <button
-                  className="btn secondary"
-                  onClick={() => handleRemoveTotem(totem._id)}
-                >
-                  Remover
-                </button>
-              </>
-            )}
+        {statusMessage && (
+          <div
+            className={`status-message ${
+              statusMessage.includes("Erro") ? "error" : "success"
+            }`}
+            aria-live="polite"
+          >
+            {statusMessage}
           </div>
-        ))}
+        )}
+
+        {totems.length === 0 ? (
+          <p className="no-totens-message">Nenhum totem encontrado.</p>
+        ) : (
+          <div className="totens-list">
+            {totems.map((totem) => (
+              <div key={totem._id} className="totem-card">
+                {editingTotem && editingTotem._id === totem._id ? (
+                  <>
+                    <input
+                      type="text"
+                      value={editingTotem.title}
+                      onChange={(e) => handleUpdateField("title", e.target.value)}
+                      placeholder="Título do Totem"
+                    />
+                    <textarea
+                      value={editingTotem.description}
+                      onChange={(e) => handleUpdateField("description", e.target.value)}
+                      placeholder="Descrição do Totem"
+                    />
+                    <input
+                      type="text"
+                      value={editingTotem.videoUrl}
+                      onChange={(e) => handleUpdateField("videoUrl", e.target.value)}
+                      placeholder="URL do Vídeo"
+                    />
+                    <button className="btn success" onClick={handleSaveChanges}>
+                      Atualizar
+                    </button>
+                    <button
+                      className="btn secondary"
+                      onClick={() => setEditingTotem(null)}
+                    >
+                      Cancelar
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <h3>{totem.title}</h3>
+                    <p>{totem.description}</p>
+                    <p>{totem.videoUrl}</p>
+                    <button
+                      className="btn primary"
+                      onClick={() => handleStartEditing(totem)}
+                    >
+                      Editar
+                    </button>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
-    </div>
+    </>
   );
 }
 

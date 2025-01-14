@@ -6,6 +6,7 @@ import './login.css';
 
 function LoginPage() {
   const [token, setToken] = useState('');
+  const [name, setName] = useState(''); // Novo estado para o nome
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('cliente');
@@ -19,7 +20,7 @@ function LoginPage() {
       const response = await axios.post('/auth/login', { email, password });
       const tokenFromApi = response.data.token;
 
-      localStorage.setItem('userName', email);
+      localStorage.setItem('userName', name);
       localStorage.setItem('userToken', tokenFromApi);
       setToken(tokenFromApi);
 
@@ -39,7 +40,7 @@ function LoginPage() {
   const handleRegister = async () => {
     setError('');
     try {
-      await axios.post('/auth/register', { email, password, role });
+      await axios.post('/auth/register', { name, email, password, role }); // Enviando o nome
       alert('Usuário registrado com sucesso!');
       setIsRegistering(false);
     } catch (err) {
@@ -53,6 +54,20 @@ function LoginPage() {
         <h2 className="logint">{isRegistering ? 'Registrar' : 'Login'}</h2>
 
         {error && <p className="error-message">{error}</p>}
+
+        {isRegistering && ( // Exibir campo de nome apenas no registro
+          <div className="form-group">
+            <label htmlFor="name">Nome</label>
+            <input
+              type="text"
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Digite seu nome"
+              required
+            />
+          </div>
+        )}
 
         <div className="form-group">
           <label htmlFor="email">Email</label>

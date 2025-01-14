@@ -1,0 +1,89 @@
+/* Estilos para o menu lateral */
+.lateral-menu {
+  width: 300px;
+  color: black;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  top: 87px;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  border-radius: 0;
+  display: flex;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+  overflow-y: auto;
+  transition: transform 0.3s ease, width 0.3s ease;
+}
+
+/* Lista de usuários */
+.user-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.user-list li {
+  padding: 15px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+  width: 100%;
+}
+
+.user-list li:hover {
+  background-color: #34495e;
+}
+
+.user-list li.selected {
+  background-color: #1abc9c;
+  font-weight: bold;
+}
+
+/* Opções do usuário selecionado */
+.options-container {
+  margin-top: 20px;
+  background-color: #ecf0f1;
+  padding: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 4px;
+}
+
+/* Estilos dos botões */
+.options-container button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  margin-bottom: 10px;
+}
+
+.options-container button:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+}
+
+/* Botão de adicionar totem */
+.add-totem button {
+  background-color: #1abc9c;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.add-totem button:hover {
+  background-color: #16a085;
+}
+
+h3 {
+  text-align: center;
+}
