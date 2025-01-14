@@ -2,20 +2,21 @@ import React, { useState, useEffect } from "react";
 import axios from "../../services/axios";
 import "./TotemList.css";
 
-const TotemList = () => {
+const TotemList = ({ userId }) => {
   const [totems, setTotems] = useState([]);
-  const [newTotem, setNewTotem] = useState({ title: "", description: "", link: "" });
+  const [newTotem, setNewTotem] = useState({ title: "", description: "", videoUrl: "" });
   const [editingTotem, setEditingTotem] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  // Fetch de todos os totens
+  // Fetch de todos os totens do usuário selecionado
   useEffect(() => {
     const fetchTotems = async () => {
       try {
         const token = localStorage.getItem("userToken");
         if (!token) throw new Error("Token não encontrado.");
 
-        const response = await axios.get("/totems", {
+        const response = await axios.get(`/totems?userId=${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -28,13 +29,15 @@ const TotemList = () => {
     };
 
     fetchTotems();
-  }, []);
+  }, [userId]);
 
   // Lógica para adicionar um novo totem
   const handleAddTotem = async () => {
     try {
       const token = localStorage.getItem("userToken");
       if (!token) throw new Error("Token inválido.");
+
+      console.log("Dados enviados:", newTotem);
 
       const response = await axios.post(
         "/totems",
@@ -43,9 +46,12 @@ const TotemList = () => {
       );
 
       setTotems([...totems, response.data]);
-      setNewTotem({ title: "", description: "", link: "" });
+      setNewTotem({ title: "", description: "", videoUrl: "" });
+      setErrorMessage("");
     } catch (error) {
       console.error("Erro ao adicionar totem:", error);
+      console.log("Resposta do erro:", error.response?.data);
+      setErrorMessage(error.response?.data?.error || 'Erro ao adicionar totem.');
     }
   };
 
@@ -67,8 +73,10 @@ const TotemList = () => {
         prev.map((totem) => (totem._id === id ? response.data : totem))
       );
       setEditingTotem(null);
+      setErrorMessage("");
     } catch (error) {
       console.error("Erro ao editar totem:", error);
+      setErrorMessage(error.response?.data?.error || 'Erro ao editar totem.');
     }
   };
 
@@ -83,8 +91,10 @@ const TotemList = () => {
       });
 
       setTotems((prev) => prev.filter((totem) => totem._id !== id));
+      setErrorMessage("");
     } catch (error) {
       console.error("Erro ao deletar totem:", error);
+      setErrorMessage(error.response?.data?.error || 'Erro ao deletar totem.');
     }
   };
 
@@ -104,6 +114,8 @@ const TotemList = () => {
     <div className="totemList">
       <h2>Lista de Totens</h2>
 
+      {errorMessage && <p className="error-message">{errorMessage}</p>}
+
       {/* Formulário para adicionar novo totem */}
       <div>
         <h3>Adicionar Novo Totem</h3>
@@ -122,10 +134,10 @@ const TotemList = () => {
           }
         />
         <input
-          type="url"
-          placeholder="Link do Vídeo"
-          value={newTotem.link}
-          onChange={(e) => setNewTotem({ ...newTotem, link: e.target.value })}
+          type="text"
+          placeholder="URL do Vídeo"
+          value={newTotem.videoUrl}
+          onChange={(e) => setNewTotem({ ...newTotem, videoUrl: e.target.value })}
         />
         <button onClick={handleAddTotem}>Adicionar Totem</button>
       </div>
@@ -141,7 +153,7 @@ const TotemList = () => {
                 <p>{totem.description}</p>
                 <p>
                   <a
-                    href={totem.link}
+                    href={totem.videoUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -178,9 +190,9 @@ const TotemList = () => {
           />
           <input
             type="url"
-            value={editingTotem.link}
+            value={editingTotem.videoUrl}
             onChange={(e) =>
-              setEditingTotem({ ...editingTotem, link: e.target.value })
+              setEditingTotem({ ...editingTotem, videoUrl: e.target.value })
             }
           />
           <button onClick={() => handleEditTotem(editingTotem._id)}>
