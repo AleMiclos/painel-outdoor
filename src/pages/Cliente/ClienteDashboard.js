@@ -3,6 +3,7 @@ import axios from "../../services/axios";
 import { Oval } from "react-loader-spinner";
 import "./painel.css";
 import Navbar from "../../components/menu/Navbar";
+import { Link } from "react-router-dom";
 
 function TotemsDashboard() {
   const [totems, setTotems] = useState([]);
@@ -123,8 +124,9 @@ function TotemsDashboard() {
                   <>
                     <h3>{totem.title}</h3>
                     <p>{totem.description}</p>
-                    <p>{totem.videoUrl}</p>
-                    <button
+                    <p>
+                  <Link target="_blank" to={`/totem/${totem._id}`}>Ver Totem</Link>
+                </p>                    <button
                       className="btn primary"
                       onClick={() => handleStartEditing(totem)}
                     >

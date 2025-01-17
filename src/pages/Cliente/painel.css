@@ -62,13 +62,13 @@
 }
 
 /* Totens List */
-.totens-list {
+/*.totens-list {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* Sempre 3 colunas por linha */
-  gap: 20px; /* Espaço entre os cards */
-  margin-top: 20px; /* Espaço adicional no topo */
-  justify-content: center; /* Centraliza os cards */
-}
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px; 
+  margin-top: 20px; 
+  justify-content: center; 
+} */
 
 /* Totem Card */
 .totem-card {
