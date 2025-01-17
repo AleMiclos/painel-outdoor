@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from '../../services/axios';
-import { jwtDecode } from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode'; // Remover as chaves {} da importação
 import { useNavigate } from 'react-router-dom';
 import './login.css';
 
@@ -19,12 +19,12 @@ function LoginPage() {
     try {
       const response = await axios.post('/auth/login', { email, password });
       const tokenFromApi = response.data.token;
+      const decoded = jwtDecode(tokenFromApi);
 
-      localStorage.setItem('userName', name);
+      localStorage.setItem('userName', decoded.name); // Armazena o nome decodificado do token
       localStorage.setItem('userToken', tokenFromApi);
       setToken(tokenFromApi);
 
-      const decoded = jwtDecode(tokenFromApi);
       const { role, totemId } = decoded;
 
       if (role === 'admin') {

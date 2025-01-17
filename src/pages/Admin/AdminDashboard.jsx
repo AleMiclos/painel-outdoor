@@ -3,7 +3,7 @@ import axios from "../../services/axios.js";
 import { Oval } from "react-loader-spinner";
 import "./adminPainel.css";
 import Navbar from "../../components/menu/Navbar.jsx";
-import LateralMenu from "../../components/lateralmenu/LateralMenu.jsx";
+import LateralMenu from "../../components/MenuUsuarios/LateralMenu.jsx";
 import TotemList from "../../components/totemlist/TotemList.jsx";
 
 const StatusMessage = ({ message }) => {

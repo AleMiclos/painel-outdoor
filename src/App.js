@@ -5,13 +5,17 @@ import ClienteDashboard from "./pages/Cliente/ClienteDashboard";
 import LoginPage from "./pages/Login/LoginPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import TotemDetails from "./components/totem/TotemDetails";
+import Home from "./pages/Home/Home";
 
 function App() {
   return (
     <Router>
       <Routes>
         {/* Página de Login */}
+        <Route path="/" element={<Home />} />
+
         <Route path="/login" element={<LoginPage />} />
+
 
         {/* Painel do Cliente */}
         <Route

@@ -108,12 +108,7 @@ function TotemsDashboard() {
                       onChange={(e) => handleUpdateField("description", e.target.value)}
                       placeholder="Descrição do Totem"
                     />
-                    <input
-                      type="text"
-                      value={editingTotem.videoUrl}
-                      onChange={(e) => handleUpdateField("videoUrl", e.target.value)}
-                      placeholder="URL do Vídeo"
-                    />
+                    
                     <button className="btn success" onClick={handleSaveChanges}>
                       Atualizar
                     </button>

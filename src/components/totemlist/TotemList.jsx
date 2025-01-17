@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from "react";
 import axios from "../../services/axios";
+import TotemDetails from "../totem/TotemDetails";
+import { Link } from "react-router-dom";
+
 import "./TotemList.css";
 
 const TotemList = ({ userId }) => {
   const [totems, setTotems] = useState([]);
-  const [newTotem, setNewTotem] = useState({ title: "", description: "", videoUrl: "" });
+  const [newTotem, setNewTotem] = useState({
+    title: "",
+    description: "",
+    videoUrl: "",
+  });
   const [editingTotem, setEditingTotem] = useState(null);
+  const [selectedTotem, setSelectedTotem] = useState(null); // Para exibir detalhes do totem
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -37,21 +45,18 @@ const TotemList = ({ userId }) => {
       const token = localStorage.getItem("userToken");
       if (!token) throw new Error("Token inválido.");
 
-      console.log("Dados enviados:", newTotem);
-
-      const response = await axios.post(
-        "/totems",
-        newTotem,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const response = await axios.post("/totems/totems", newTotem, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       setTotems([...totems, response.data]);
       setNewTotem({ title: "", description: "", videoUrl: "" });
       setErrorMessage("");
     } catch (error) {
       console.error("Erro ao adicionar totem:", error);
-      console.log("Resposta do erro:", error.response?.data);
-      setErrorMessage(error.response?.data?.error || 'Erro ao adicionar totem.');
+      setErrorMessage(
+        error.response?.data?.error || "Erro ao adicionar totem."
+      );
     }
   };
 
@@ -63,11 +68,9 @@ const TotemList = ({ userId }) => {
       const token = localStorage.getItem("userToken");
       if (!token) throw new Error("Token inválido.");
 
-      const response = await axios.put(
-        `/totems/${id}`,
-        editingTotem,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const response = await axios.put(`/totems/${id}`, editingTotem, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       setTotems((prev) =>
         prev.map((totem) => (totem._id === id ? response.data : totem))
@@ -76,7 +79,7 @@ const TotemList = ({ userId }) => {
       setErrorMessage("");
     } catch (error) {
       console.error("Erro ao editar totem:", error);
-      setErrorMessage(error.response?.data?.error || 'Erro ao editar totem.');
+      setErrorMessage(error.response?.data?.error || "Erro ao editar totem.");
     }
   };
 
@@ -94,11 +97,10 @@ const TotemList = ({ userId }) => {
       setErrorMessage("");
     } catch (error) {
       console.error("Erro ao deletar totem:", error);
-      setErrorMessage(error.response?.data?.error || 'Erro ao deletar totem.');
+      setErrorMessage(error.response?.data?.error || "Erro ao deletar totem.");
     }
   };
 
-  // Agrupando totens por usuário
   const groupedTotems = totems.reduce((acc, totem) => {
     const userName = totem.userName || "Desconhecido";
     if (!acc[userName]) acc[userName] = [];
@@ -116,7 +118,6 @@ const TotemList = ({ userId }) => {
 
       {errorMessage && <p className="error-message">{errorMessage}</p>}
 
-      {/* Formulário para adicionar novo totem */}
       <div>
         <h3>Adicionar Novo Totem</h3>
         <input
@@ -137,12 +138,13 @@ const TotemList = ({ userId }) => {
           type="text"
           placeholder="URL do Vídeo"
           value={newTotem.videoUrl}
-          onChange={(e) => setNewTotem({ ...newTotem, videoUrl: e.target.value })}
+          onChange={(e) =>
+            setNewTotem({ ...newTotem, videoUrl: e.target.value })
+          }
         />
         <button onClick={handleAddTotem}>Adicionar Totem</button>
       </div>
 
-      {/* Lista de Totens agrupados por usuário */}
       {Object.keys(groupedTotems).map((userName) => (
         <div key={userName} className="user-group">
           <h3>{userName}</h3>
@@ -152,13 +154,7 @@ const TotemList = ({ userId }) => {
                 <h4>{totem.title}</h4>
                 <p>{totem.description}</p>
                 <p>
-                  <a
-                    href={totem.videoUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Ver Totem
-                  </a>
+                  <Link target="_blank" to={`/totem/${totem._id}`}>Ver Totem</Link>
                 </p>
                 <button onClick={() => setEditingTotem(totem)}>Editar</button>
                 <button onClick={() => handleDeleteTotem(totem._id)}>
@@ -170,7 +166,6 @@ const TotemList = ({ userId }) => {
         </div>
       ))}
 
-      {/* Formulário para editar um totem */}
       {editingTotem && (
         <div>
           <h3>Editar Totem</h3>
@@ -200,6 +195,13 @@ const TotemList = ({ userId }) => {
           </button>
           <button onClick={() => setEditingTotem(null)}>Cancelar</button>
         </div>
+      )}
+
+      {selectedTotem && (
+        <TotemDetails
+          totem={selectedTotem}
+          onClose={() => setSelectedTotem(null)}
+        />
       )}
     </div>
   );

@@ -12,16 +12,17 @@ a {
 }
 
 .header {
-    position: fixed;
+    position: relative;
     top: 0;
     left: 0;
     width: 100%;
-    padding: 20px 10%;
+    padding: 15px 10%;
     background-color: seagreen;
     display: flex;
     justify-content: space-between;
     align-items: center;
     z-index: 100;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .logo {
@@ -30,35 +31,116 @@ a {
     color: #fff;
 }
 
-.navbar a{
-    position:relative;
+.navbar {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.navbar a {
     font-size: 18px;
     color: #fff;
     font-weight: 500;
-    margin-left: 40px;
+    position: relative;
 }
 
-.navbar a::before{
+.navbar a::before {
     position: absolute;
+    content: '';
+    bottom: -3px;
+    left: 0;
     width: 0;
     height: 2px;
     background-color: #fff;
-    content: '';
-    top: 100%;
-    left: 0;
-    transition: .3s;
+    transition: width 0.3s ease;
 }
 
 .navbar a:hover::before {
     width: 100%;
+}
 
+.user-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
 .user-info {
-    position:relative;
     font-size: 18px;
     color: #fff;
     font-weight: 500;
-    margin-left: 40px;
-  }
-  
+}
+
+.login-btn, .logout-btn {
+    padding: 10px 20px;
+    background-color: #fff;
+    color: seagreen;
+    font-size: 16px;
+    font-weight: 500;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.login-btn:hover, .logout-btn:hover {
+    background-color: #ffb400;
+    color: #fff;
+}
+
+/* Menu Toggle para dispositivos móveis */
+/* Menu Toggle para dispositivos móveis */
+.menu-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.menu-toggle div {
+    width: 30px;
+    height: 3px;
+    background-color: #fff;
+    transition: transform 0.3s ease;
+}
+
+.navbar {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.navbar a {
+    font-size: 18px;
+    color: #fff;
+    font-weight: 500;
+    position: relative;
+}
+
+/* Responsividade */
+@media screen and (max-width: 768px) {
+    .navbar {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .navbar.active {
+        display: flex;
+    }
+
+    .menu-toggle {
+        display: flex;
+    }
+    
+    .header {
+        padding: 10px 5%;
+    }
+
+    .logo {
+        font-size: 24px;
+    }
+}
+
+
+
