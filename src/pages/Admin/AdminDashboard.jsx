@@ -109,14 +109,12 @@ function AdminDashboard() {
   }
 
   return (
-    <div className="admin-dashboard">
-      <Navbar />
+    <><Navbar /><div className="admin-dashboard">
       <StatusMessage message={statusMessage} />
       <div className="layout-container">
         <LateralMenu
           onSelectUser={setSelectedUserId}
-          selectedUser={selectedUserId}
-        />
+          selectedUser={selectedUserId} />
         <div className="main-content">
           {selectedUserId ? (
             <TotemList
@@ -126,17 +124,14 @@ function AdminDashboard() {
               onDelete={handleDelete}
               isEditing={!!editingTotem}
               editingTotem={editingTotem}
-              onUpdateField={(field, value) =>
-                setEditingTotem((prev) => ({ ...prev, [field]: value }))
-              }
-              onSaveChanges={handleSaveChanges}
-            />
+              onUpdateField={(field, value) => setEditingTotem((prev) => ({ ...prev, [field]: value }))}
+              onSaveChanges={handleSaveChanges} />
           ) : (
             <p className="no-user-selected"></p>
           )}
         </div>
       </div>
-    </div>
+    </div></>
   );
 }
 

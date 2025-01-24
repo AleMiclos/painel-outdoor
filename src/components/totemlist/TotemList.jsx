@@ -11,13 +11,14 @@ const TotemList = ({ userId }) => {
     title: "",
     description: "",
     videoUrl: "",
+    address: "",
+    isOnline: false,
   });
   const [editingTotem, setEditingTotem] = useState(null);
-  const [selectedTotem, setSelectedTotem] = useState(null); // Para exibir detalhes do totem
+  const [selectedTotem, setSelectedTotem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Fetch de todos os totens do usuário selecionado
   useEffect(() => {
     const fetchTotems = async () => {
       try {
@@ -30,7 +31,8 @@ const TotemList = ({ userId }) => {
 
         setTotems(response.data);
       } catch (error) {
-        console.error("Erro ao buscar totens:", error);
+        setErrorMessage("Erro ao buscar totens. Tente novamente mais tarde.");
+        console.error(error);
       } finally {
         setLoading(false);
       }
@@ -39,7 +41,6 @@ const TotemList = ({ userId }) => {
     fetchTotems();
   }, [userId]);
 
-  // Lógica para adicionar um novo totem
   const handleAddTotem = async () => {
     try {
       const token = localStorage.getItem("userToken");
@@ -50,17 +51,20 @@ const TotemList = ({ userId }) => {
       });
 
       setTotems([...totems, response.data]);
-      setNewTotem({ title: "", description: "", videoUrl: "" });
+      setNewTotem({
+        title: "",
+        description: "",
+        videoUrl: "",
+        address: "",
+        isOnline: false,
+      });
       setErrorMessage("");
     } catch (error) {
-      console.error("Erro ao adicionar totem:", error);
-      setErrorMessage(
-        error.response?.data?.error || "Erro ao adicionar totem."
-      );
+      console.error(error);
+      setErrorMessage("Erro ao adicionar totem. Verifique os campos.");
     }
   };
 
-  // Lógica para editar um totem
   const handleEditTotem = async (id) => {
     if (!editingTotem) return;
 
@@ -78,12 +82,11 @@ const TotemList = ({ userId }) => {
       setEditingTotem(null);
       setErrorMessage("");
     } catch (error) {
-      console.error("Erro ao editar totem:", error);
-      setErrorMessage(error.response?.data?.error || "Erro ao editar totem.");
+      console.error(error);
+      setErrorMessage("Erro ao editar totem.");
     }
   };
 
-  // Lógica para deletar um totem
   const handleDeleteTotem = async (id) => {
     try {
       const token = localStorage.getItem("userToken");
@@ -96,30 +99,20 @@ const TotemList = ({ userId }) => {
       setTotems((prev) => prev.filter((totem) => totem._id !== id));
       setErrorMessage("");
     } catch (error) {
-      console.error("Erro ao deletar totem:", error);
-      setErrorMessage(error.response?.data?.error || "Erro ao deletar totem.");
+      console.error(error);
+      setErrorMessage("Erro ao deletar totem.");
     }
   };
 
-  const groupedTotems = totems.reduce((acc, totem) => {
-    const userName = totem.userName || "Desconhecido";
-    if (!acc[userName]) acc[userName] = [];
-    acc[userName].push(totem);
-    return acc;
-  }, {});
-
-  if (loading) {
-    return <p>Carregando totens...</p>;
-  }
+  if (loading) return <p>Carregando totens...</p>;
 
   return (
     <div className="totemList">
-      <h2>Lista de Totens</h2>
-
+      <h2>Totens</h2>
       {errorMessage && <p className="error-message">{errorMessage}</p>}
 
-      <div>
-        <h3>Adicionar Novo Totem</h3>
+      <div className="form">
+        <h3>Novo Totem</h3>
         <input
           type="text"
           placeholder="Título"
@@ -135,39 +128,62 @@ const TotemList = ({ userId }) => {
           }
         />
         <input
-          type="text"
+          type="url"
           placeholder="URL do Vídeo"
           value={newTotem.videoUrl}
           onChange={(e) =>
             setNewTotem({ ...newTotem, videoUrl: e.target.value })
           }
         />
-        <button onClick={handleAddTotem}>Adicionar Totem</button>
+        <input
+          type="text"
+          placeholder="Endereço"
+          value={newTotem.address}
+          onChange={(e) =>
+            setNewTotem({ ...newTotem, address: e.target.value })
+          }
+        />
+        <label>
+          <input
+            type="checkbox"
+            checked={newTotem.isOnline}
+            onChange={(e) =>
+              setNewTotem({ ...newTotem, isOnline: e.target.checked })
+            }
+          />
+          Online
+        </label>
+        <button onClick={handleAddTotem}>Adicionar</button>
       </div>
 
-      {Object.keys(groupedTotems).map((userName) => (
-        <div key={userName} className="user-group">
-          <h3>{userName}</h3>
-          <ul>
-            {groupedTotems[userName].map((totem) => (
-              <li key={totem._id}>
-                <h4>{totem.title}</h4>
-                <p>{totem.description}</p>
-                <p>
-                  <Link target="_blank" to={`/totem/${totem._id}`}>Ver Totem</Link>
-                </p>
-                <button onClick={() => setEditingTotem(totem)}>Editar</button>
-                <button onClick={() => handleDeleteTotem(totem._id)}>
-                  Deletar
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
+      <div className="totem-list">
+        {totems.map((totem) => (
+          <div key={totem._id} className="totem-card">
+            <h4>{totem.title}</h4>
+            <p>{totem.description}</p>
+            <p>Endereço: {totem.address}</p>
+            <p>
+              Status:{" "}
+              <span style={{ color: totem.isOnline ? "green" : "red" }}>
+                {totem.isOnline ? "Online" : "Offline"}
+              </span>
+            </p>
+            <p>
+              {" "}
+              <Link target="_blank" to={`/totem/${totem._id}`}>
+                Ver Totem
+              </Link>{" "}
+            </p>
+            <button onClick={() => setEditingTotem(totem)}>Editar</button>
+            <button onClick={() => handleDeleteTotem(totem._id)}>
+              Deletar
+            </button>
+          </div>
+        ))}
+      </div>
 
       {editingTotem && (
-        <div>
+        <div className="edit-form">
           <h3>Editar Totem</h3>
           <input
             type="text"
@@ -190,8 +206,25 @@ const TotemList = ({ userId }) => {
               setEditingTotem({ ...editingTotem, videoUrl: e.target.value })
             }
           />
+          <input
+            type="text"
+            value={editingTotem.address}
+            onChange={(e) =>
+              setEditingTotem({ ...editingTotem, address: e.target.value })
+            }
+          />
+          <label>
+            <input
+              type="checkbox"
+              checked={editingTotem.isOnline}
+              onChange={(e) =>
+                setEditingTotem({ ...editingTotem, isOnline: e.target.checked })
+              }
+            />
+            Online
+          </label>
           <button onClick={() => handleEditTotem(editingTotem._id)}>
-            Salvar Alterações
+            Salvar
           </button>
           <button onClick={() => setEditingTotem(null)}>Cancelar</button>
         </div>
